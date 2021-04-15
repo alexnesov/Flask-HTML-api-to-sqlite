@@ -25,7 +25,9 @@ def readSqlite(SQL_COMMAND, path='utils/marketdataSQL.db'):
 
 @app.route('/')
 def home():
-    return render_template('mainpage.html')
+    return render_template('mainpage.html',
+                           currentWD=currentWD,
+                           valid=True)
 
 
 @app.route("/getCSV", methods=['GET'])
@@ -73,12 +75,14 @@ def executeSQL():
             valid = False
             return render_template('mainpage.html',
                                    valid=valid,
+                                   currentWD=currentWD,
                                    SQL_COMMAND=SQL_COMMAND)
     else:
         print("Empty command")
         valid = False
         return render_template('mainpage.html',
                                valid=valid,
+                               currentWD=currentWD,
                                SQL_COMMAND=SQL_COMMAND)
 
 
