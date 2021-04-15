@@ -4,7 +4,6 @@ import sqlite3
 import pandas as pd
 import os
 
-from utils import csv_util
 
 app = Flask(__name__, static_url_path='/static')
 
@@ -70,7 +69,7 @@ def executeSQL():
                 currentWD=currentWD)
         except sqlite3.OperationalError:
             # If error in sql comand
-            print("error")
+            print("error in the SQL command")
             valid = False
             return render_template('mainpage.html',
                                    valid=valid,
