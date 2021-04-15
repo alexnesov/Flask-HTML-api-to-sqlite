@@ -15,8 +15,9 @@
 
   <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
     <div class="container">
-
       <span class="navbar-brand mb-0 h1">Sqlite explorer</span>
+      <p class="navbar-text">Beta</p>
+
     </div>
   </nav>
 
@@ -28,11 +29,27 @@
           <div class="card-header">
             Parameters
           </div>
+          <div class="card-body">
+            <div class="row align-items-center">
+              <label class="form-label">Location for CSV saving:</label>
+
+              <div class="mb-3">
+                <input class="form-control" placeholder="{{ currentWD }}">
+              </div>
+
+              <div>
+                <label class="form-label">Path to sqlite DB:</label>
+
+                <div class="mb-3">
+                  <input class="form-control" placeholder="{{ currentWD }}">
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
       </div>
       <div class="col-sm">
-
 
         <div class="card">
           <div class="card-header">
@@ -41,8 +58,13 @@
           <div class="card-body" id="sql_container">
             <form method="POST">
               <div class="input-group input-group-lg">
-                <textarea type="text" name="textarea" class="form-control" id="textarea"
+                {% if valid==True %}
+                <textarea type="text" name="textarea" class="form-control is-valid" id="textarea"
                   rows="4">{{SQL_COMMAND}}</textarea>
+                {%else%}
+                <textarea type="text" name="textarea" class="form-control is-invalid" id="textarea"
+                  rows="4">{{SQL_COMMAND}}</textarea>
+                {% endif %}
               </div>
               <div class="col text-center" id="exc_btn">
                 <button class="btn btn-dark" type="submit">Execute command</button>
@@ -62,8 +84,18 @@
 
   </div>
 
+  <div class="container" id="Save">
+
+    <p class=" alignleft" id="sql_title">Output</p>
+    <p class="alignright">
+      <a href="/getCSV" input class="btn btn-success btn-sm mr-2 mb-2" id="getcsv">Save as CSV</a>
+    </p>
+  </div>
+  </div>
+  <div style="clear: both;"></div>
+
   <div class="container">
-    <p id="sql_title">Output</p>
+
 
     <div class="table-wrapper-scroll-y my-custom-scrollbar">
 
