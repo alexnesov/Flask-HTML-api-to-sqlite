@@ -1,7 +1,9 @@
-import sqlite3 
+import sqlite3
 import pandas as pd
 
-dbname='marketdataSQL.db'
+dbname = 'marketdataSQL.db'
+
+
 def createTable(dbname='marketdataSQL.db'):
     """
     create Tabme in sqlite3 DB
@@ -16,7 +18,7 @@ def createTable(dbname='marketdataSQL.db'):
         Low float, 
         Close float,
         Volume int)''')
-    
+
     conn.commit()
     conn.close()
 
@@ -31,12 +33,21 @@ def dfToSqlite(df, tableName, path='utils/marketdataSQL.db'):
     """
     conn = sqlite3.connect('utils/marketdataSQL.db')
     c = conn.cursor()
-    df.to_sql(f'{tableName}', conn, if_exists='append',index=False)
-    
+    df.to_sql(f'{tableName}', conn, if_exists='append', index=False)
+
     conn.commit()
     conn.close()
 
 
+query = "select * from quotes"
+
+
+def readSqlite(tableName, path='utils/marketdataSQL.db', query):
+    conn = sqlite3.connect('utils/marketdataSQL.db')
+    mycur = conn.cursor()
+    mycur.execute(f"{query}")
+    available_table = (mycur.fetchall())
+
 
 df = pd.read_csv('utils/NASDAQ.csv')
-dfToSqlite(df,'quotes')
+dfToSqlite(df, 'quotes')

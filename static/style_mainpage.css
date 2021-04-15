@@ -25,3 +25,22 @@
 #textarea {
     height: 200px;
   }
+
+
+  
+.table{
+    overflow-x: auto;
+    font-size: small;
+    }
+
+.my-custom-scrollbar {
+    margin-top: 4px;
+    position: relative;
+    height: 700px;
+    overflow: auto;
+    }
+    
+.table-wrapper-scroll-y {
+display: block;
+}
+    
