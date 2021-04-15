@@ -33,34 +33,32 @@
           </div>
           <div class="card-body">
             <div class="row align-items-center">
-              <label class="form-label">Location for CSV saving:</label>
+              <form action="{{ url_for('executeSQL') }}" method="post">
 
-              <div class="mb-3">
-                <input class="form-control form-control-sm" placeholder="{{ currentWD }}">
-              </div>
-
-              <div>
-                <label class="form-label">Path to sqlite DB:</label>
+                <label class="form-label">Location for CSV saving:</label>
 
                 <div class="mb-3">
-                  <input class="form-control form-control-sm" placeholder="{{ pathToDB }}">
+                  <input class="form-control" placeholder="{{ currentWD }}">
                 </div>
-              </div>
 
-
-              <div>
-                <label class="form-label">Name of database:</label>
-
-                <div class="mb-3">
-                  <input class="form-control">
+                <div>
+                  <label class="form-label">Path to sqlite DB:</label>
+                  <div class="mb-3">
+                    <input class="form-control" name="dbPathForm" id="dbPathForm" placeholder="{{ DB_USER_INPUT }}">
+                  </div>
                 </div>
-              </div>
-
+                <div>
+                  <label class="form-label">Name of database:</label>
+                  <div class="mb-3">
+                    <input class="form-control">
+                  </div>
+                </div>
             </div>
           </div>
         </div>
 
       </div>
+
       <div class="col-sm">
 
         <div class="card">
