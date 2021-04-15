@@ -16,8 +16,8 @@
     margin-top: 10px;
 }
 
-#second {
-    margin: auto;
+#Save {
+    margin-top: 10px;
 }
 
 
@@ -34,7 +34,7 @@
     }
 
 .my-custom-scrollbar {
-    margin-top: 4px;
+    margin-top: 2px;
     position: relative;
     height: 700px;
     overflow: auto;
@@ -42,5 +42,13 @@
     
 .table-wrapper-scroll-y {
 display: block;
+}
+
+
+.alignleft {
+	float: left;
+}
+.alignright {
+	float: right;
 }
     
