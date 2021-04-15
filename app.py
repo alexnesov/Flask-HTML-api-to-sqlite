@@ -2,24 +2,9 @@
 from flask import Flask, render_template, request
 import sqlite3
 
-"""
-# Minimum reproductible example
-
-# Two questions:
-
-1. Should we call function outside route functions? so that we have them available 
-mumtiple route function?
-If no, what is the other better solution?
-
-2. How to use the same arguments without repeting them?
-(i. e passing same argument to multile function --> render_template())
-"""
 app = Flask(__name__, static_url_path='/static')
 
 SQL_COMMAND = ''
-sql_output = ()
-tableName = ''
-colNames = []
 
 
 def readSqlite(tableName, SQL_COMMAND, path='utils/marketdataSQL.db'):
@@ -38,17 +23,13 @@ def readSqlite(tableName, SQL_COMMAND, path='utils/marketdataSQL.db'):
 def home():
 
     return render_template(
-        'welcome.html',
+        'mainpage.html',
         SQL_COMMAND=SQL_COMMAND,
     )
 
 
 @app.route('/', methods=['POST'])
-def my_form_post():
-    global SQL_COMMAND
-    global sql_output
-    global colNames
-
+def executeSQL():
     SQL_COMMAND = request.form['textarea']
 
     sql_output, colNames = readSqlite(tableName='quotes',
@@ -60,7 +41,7 @@ def my_form_post():
     print("output: ", sql_output)
 
     return render_template(
-        'welcome.html',
+        'mainpage.html',
         SQL_COMMAND=SQL_COMMAND,
         sql_output=sql_output,
         colNames=colNames,
