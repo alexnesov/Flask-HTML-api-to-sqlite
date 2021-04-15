@@ -1,0 +1,27 @@
+
+#sql_title{
+    font-weight: bold;
+}
+
+#first_block{
+    margin-top: 100px;
+}
+
+#sql_container {
+    width: 500px;
+    margin: auto;
+}
+
+#exc_btn {
+    margin-top: 10px;
+}
+
+#second {
+    margin: auto;
+}
+
+
+
+#textarea {
+    height: 200px;
+  }
