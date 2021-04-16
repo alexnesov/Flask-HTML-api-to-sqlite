@@ -1,5 +1,5 @@
 # import the Flask class from the flask module
-from flask import Flask, render_template, request, Response
+from flask import Flask, render_template, request, Response, redirect, url_for
 import sqlite3
 import pandas as pd
 import os
@@ -34,7 +34,6 @@ def home():
                            currentWD=currentWD,
                            DB_USER_INPUT=DB_USER_INPUT,
                            valid=True)
-
 # to do: init command to avoid red arrow
 
 
@@ -69,7 +68,7 @@ def STD_FUNC_FALSE():
     return standard_args
 
 
-@app.route('/', methods=['POST'])
+@app.route('/executed', methods=['POST'])
 def executeSQL():
     global SQL_COMMAND
     global sql_output
@@ -77,40 +76,48 @@ def executeSQL():
     global INIT
 
     SQL_COMMAND = request.form['textarea']
-    if INIT == True:
-        print('init true')
-        DB_USER_INPUT = request.form.get('dbPathForm')
 
     print('user input:', DB_USER_INPUT)
+    print("cmd:", SQL_COMMAND)
 
-    if SQL_COMMAND:
-        try:
-            std_args, df = STD_FUNC_TRUE(dbpath=DB_USER_INPUT)
-            INIT = False
+    if request.method == "POST":
+        if INIT == True:
+            print('init true')
+            DB_USER_INPUT = request.form.get('dbPathForm')
 
-            return render_template(
-                'mainpage.html',
-                SQL_COMMAND=SQL_COMMAND,
-                **std_args)
-        except sqlite3.OperationalError:
-            # If error in sql comand
-            print("error in the SQL command")
+        if SQL_COMMAND:
+            try:
+                std_args, df = STD_FUNC_TRUE(dbpath=DB_USER_INPUT)
+                INIT = False
+
+                return render_template(
+                    'mainpage.html',
+                    SQL_COMMAND=SQL_COMMAND,
+                    **std_args)
+            except sqlite3.OperationalError:
+                # If error in sql comand
+                print("error in the SQL command")
+                std_args = STD_FUNC_FALSE()
+
+                return render_template('mainpage.html',
+                                       SQL_COMMAND=SQL_COMMAND,
+                                       **std_args)
+        else:
+            print("Empty command")
             std_args = STD_FUNC_FALSE()
 
             return render_template('mainpage.html',
                                    SQL_COMMAND=SQL_COMMAND,
                                    **std_args)
     else:
-        print("Empty command")
-        std_args = STD_FUNC_FALSE()
-
         return render_template('mainpage.html',
-                               SQL_COMMAND=SQL_COMMAND,
-                               **std_args)
+                               currentWD=currentWD,
+                               DB_USER_INPUT=DB_USER_INPUT,
+                               valid=True)
 
 
-@app.route('/getCSV')
-def test():
+@app.route('/executed')
+def generateCSV():
 
     print("HERE")
     std_args, df = STD_FUNC_TRUE(dbpath=DB_USER_INPUT)
@@ -124,39 +131,6 @@ def test():
     return render_template('mainpage.html',
                            SQL_COMMAND=SQL_COMMAND,
                            **std_args)
-
-
-@app.route("/getCSV", methods=['POST'])
-def getCSV():
-    global SQL_COMMAND
-    global sql_output
-
-    print('NOW')
-    SQL_COMMAND = request.form['textarea']
-
-    if SQL_COMMAND:
-        try:
-            std_args, df = STD_FUNC_TRUE(dbpath=DB_USER_INPUT)
-
-            return render_template(
-                'mainpage.html',
-                SQL_COMMAND=SQL_COMMAND,
-                **std_args)
-        except sqlite3.OperationalError:
-            # If error in sql comand
-            print("error in the SQL command")
-            std_args = STD_FUNC_FALSE()
-
-            return render_template('mainpage.html',
-                                   SQL_COMMAND=SQL_COMMAND,
-                                   **std_args)
-    else:
-        print("Empty command")
-        std_args = STD_FUNC_FALSE()
-
-        return render_template('mainpage.html',
-                               SQL_COMMAND=SQL_COMMAND,
-                               **std_args)
 
 
 if __name__ == '__main__':
