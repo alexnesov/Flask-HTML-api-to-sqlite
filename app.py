@@ -80,40 +80,34 @@ def executeSQL():
     print('user input:', DB_USER_INPUT)
     print("cmd:", SQL_COMMAND)
 
-    if request.method == "POST":
-        if INIT == True:
-            print('init true')
-            DB_USER_INPUT = request.form.get('dbPathForm')
+    if INIT == True:
+        print('init true')
+        DB_USER_INPUT = request.form.get('dbPathForm')
 
-        if SQL_COMMAND:
-            try:
-                std_args, df = STD_FUNC_TRUE(dbpath=DB_USER_INPUT)
-                INIT = False
+    if SQL_COMMAND:
+        try:
+            std_args, df = STD_FUNC_TRUE(dbpath=DB_USER_INPUT)
+            INIT = False
 
-                return render_template(
-                    'mainpage.html',
-                    SQL_COMMAND=SQL_COMMAND,
-                    **std_args)
-            except sqlite3.OperationalError:
-                # If error in sql comand
-                print("error in the SQL command")
-                std_args = STD_FUNC_FALSE()
-
-                return render_template('mainpage.html',
-                                       SQL_COMMAND=SQL_COMMAND,
-                                       **std_args)
-        else:
-            print("Empty command")
+            return render_template(
+                'mainpage.html',
+                SQL_COMMAND=SQL_COMMAND,
+                **std_args)
+        except sqlite3.OperationalError:
+            # If error in sql comand
+            print("error in the SQL command")
             std_args = STD_FUNC_FALSE()
 
             return render_template('mainpage.html',
                                    SQL_COMMAND=SQL_COMMAND,
                                    **std_args)
     else:
+        print("Empty command")
+        std_args = STD_FUNC_FALSE()
+
         return render_template('mainpage.html',
-                               currentWD=currentWD,
-                               DB_USER_INPUT=DB_USER_INPUT,
-                               valid=True)
+                               SQL_COMMAND=SQL_COMMAND,
+                               **std_args)
 
 
 @app.route('/executed')
