@@ -16,12 +16,7 @@ INIT = True
 currentWD = os.path.dirname(__file__)  # WD = working directory
 
 
-SQL_COMMAND = "select * from BT_Summary"
-dbpath='D:\\BT_CDL\\BT development\\cs.cdl\\Backtesting_V1_Q1\\data\\Full_Q2_BT_results\\result.db3'
-qu = "select * from Returns limit 10"
 chunk_size = 300000
-
-
 
 
 
@@ -76,11 +71,11 @@ def toCSVinChunks(dbpath, SQL_COMMAND):
                 df_result = pd.DataFrame(result, columns=colNames)
                 if init==True:
                     print("Saving as CSV. . .")
-                    df_result.to_csv('D:\\BT_CDL\\BT development\\cs.cdl\\Backtesting_V1_Q1\\data\\Full_Q2_BT_results\\file.csv', index=False)
+                    df_result.to_csv('', index=False)
                     init = False
                 else:
                     print("Saving as CSV. . .")
-                    df_result.to_csv('D:\\BT_CDL\\BT development\\cs.cdl\\Backtesting_V1_Q1\\data\\Full_Q2_BT_results\\file.csv', mode='a', header=False,
+                    df_result.to_csv('', mode='a', header=False,
                               index=False)
                 
                 del df_result # liberating memory because of potentially big data
