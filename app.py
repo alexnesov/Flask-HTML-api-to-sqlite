@@ -1,9 +1,11 @@
-# import the Flask class from the flask module
-from flask import Flask, render_template, request, Response, redirect, url_for
+"""
+Author: Alexandre Nesovic
+"""
+from flask import Flask, render_template, request
 import sqlite3
 import pandas as pd
 import os
-
+import time
 
 app = Flask(__name__, static_url_path='/static')
 
@@ -12,20 +14,132 @@ SQL_COMMAND = ""
 DB_USER_INPUT = ""
 INIT = True
 currentWD = os.path.dirname(__file__)  # WD = working directory
-#pathToDB = os.path.join(currentWD, "utils\\marketdataSQL.db")
+
+
+
+chunk_size = 300000
+
+
+
+def getNRows(dbCursor, SQL_COMMAND):
+    
+    try:
+        table = SQL_COMMAND.split("FROM")[1].split(" ")[1]
+    except IndexError:
+        table = SQL_COMMAND.split("from")[1].split(" ")[1]
+
+    dbCursor.execute(f"select count(*) from {table}")
+    nRows = dbCursor.fetchall()[0][0]
+    
+    return nRows
+
+
+def toCSVinChunks(dbpath, SQL_COMMAND):
+    """
+    Parameters
+    ----------
+    dbpath : string
+        Path to db to query
+    SQL_COMMAND : string
+        User input, being the SQL command to execute
+
+    Returns
+    -------
+    None.
+
+    """
+    
+    conn = sqlite3.connect(f'{dbpath}')
+    dbCursor = conn.cursor()
+    nRows = getNRows(dbCursor, SQL_COMMAND)
+    
+    try:
+        if nRows < 600000:
+            dbCursor.execute(f"{SQL_COMMAND}")
+            
+            colNames = list(map(lambda x: x[0], dbCursor.description))
+            
+            result = 1
+            init = True
+            ITER = 1
+            while result:
+                print("Iteration nb°: ", ITER)
+                ITER += 1
+                result = dbCursor.fetchmany(chunk_size)
+                len(result)
+                print("Converting result to df")
+                df_result = pd.DataFrame(result, columns=colNames)
+                if init==True:
+                    print("Saving as CSV. . .")
+                    df_result.to_csv('D:\\BT_CDL\\BT development\\cs.cdl\\Backtesting_V1_Q1\\data\\Full_Q2_BT_results\\file.csv', index=False)
+                    init = False
+                else:
+                    print("Saving as CSV. . .")
+                    df_result.to_csv('D:\\BT_CDL\\BT development\\cs.cdl\\Backtesting_V1_Q1\\data\\Full_Q2_BT_results\\file.csv', mode='a', header=False,
+                              index=False)
+                
+                del df_result
+            else:
+                print("Number exceeds reasonnable capacity for a CSV format (>600000 rows). Please refine the query (group the data or aggregate it) \
+                      to obtain a lighter output.")
+    except PermissionError:         
+        print(
+            "File used by another person, yourself, or simply not authorized to overwrite")
+    
+    conn.commit()
+    conn.close()
+
+
+
 
 
 def readSqlite(dbpath, SQL_COMMAND):
+    """
+    Parameters
+    ----------
+    dbpath : string
+        Path to db to query
+    SQL_COMMAND : string
+        User input, being the SQL command to execute
 
+    Returns
+    -------
+    sql_output : List of tuples
+        The output generated after the user input (sql comand) is executed
+    colNames : List
+        Name of the generated table columns
+    dbCursor : sqlite3.Cursor
+        Cursor pointing towards the sqlite db to open, contains the sql 
+        command information
+    """
+    
     conn = sqlite3.connect(f'{dbpath}')
-    mycur = conn.cursor()
-    mycur.execute(f"{SQL_COMMAND}")
-    sql_output = (mycur.fetchall())
-    colNames = list(map(lambda x: x[0], mycur.description))
+    dbCursor = conn.cursor()
+    
+    # Getting the name of the table in the query, to be able to place it in 
+    # the coming select count(*) n rows
+    
 
+    nRows = getNRows(dbCursor, SQL_COMMAND)
+    print("nRows: ", nRows)
+    
+    dbCursor.execute(f"{SQL_COMMAND}")
+    
+    if nRows > 500:
+        sql_output = dbCursor.fetchmany(500)
+    else:
+        sql_output = dbCursor.fetchall()
+        
+    colNames = list(map(lambda x: x[0], dbCursor.description))
+        
+    
+    conn.commit()
     conn.close()
 
     return sql_output, colNames
+
+
+        
 
 
 @app.route('/')
@@ -39,6 +153,8 @@ def home():
 
 def STD_FUNC_TRUE(dbpath):
     """
+    Set of standard variables to be passed inside each render_template()
+    func, to be displayed through HTML
     """
 
     sql_output, colNames = readSqlite(dbpath, SQL_COMMAND=SQL_COMMAND)
@@ -58,7 +174,12 @@ def STD_FUNC_TRUE(dbpath):
 
 
 def STD_FUNC_FALSE():
-
+    """
+    Set of standard variables to be passed inside each render_template()
+    func, to be displayed through HTML, when no data can be queried due to
+    an error 
+    """
+    
     standard_args = dict(
         currentWD=currentWD,
         valid=False,
@@ -113,14 +234,9 @@ def executeSQL():
 @app.route('/executed')
 def generateCSV():
 
-    print("HERE")
     std_args, df = STD_FUNC_TRUE(dbpath=DB_USER_INPUT)
-    print(df)
-    try:
-        df.to_csv(f"{currentWD}\\test.csv")
-    except PermissionError:
-        print(
-            'File used by another person, yourself, or simply not authorized to overwrite')
+    toCSVinChunks(DB_USER_INPUT, SQL_COMMAND)
+
 
     return render_template('mainpage.html',
                            SQL_COMMAND=SQL_COMMAND,
@@ -128,4 +244,4 @@ def generateCSV():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='127.0.0.1', port=80, debug=True)
