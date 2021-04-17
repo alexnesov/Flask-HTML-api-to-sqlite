@@ -16,8 +16,12 @@ INIT = True
 currentWD = os.path.dirname(__file__)  # WD = working directory
 
 
-
+SQL_COMMAND = "select * from BT_Summary"
+dbpath='D:\\BT_CDL\\BT development\\cs.cdl\\Backtesting_V1_Q1\\data\\Full_Q2_BT_results\\result.db3'
+qu = "select * from Returns limit 10"
 chunk_size = 300000
+
+
 
 
 
@@ -58,15 +62,16 @@ def toCSVinChunks(dbpath, SQL_COMMAND):
             dbCursor.execute(f"{SQL_COMMAND}")
             
             colNames = list(map(lambda x: x[0], dbCursor.description))
+            result = dbCursor.fetchmany(chunk_size)
             
-            result = 1
             init = True
             ITER = 1
-            while result:
+            while len(result) != 0:
                 print("Iteration nb°: ", ITER)
                 ITER += 1
-                result = dbCursor.fetchmany(chunk_size)
-                len(result)
+                
+                print("len result: ", len(result))
+                
                 print("Converting result to df")
                 df_result = pd.DataFrame(result, columns=colNames)
                 if init==True:
@@ -78,10 +83,11 @@ def toCSVinChunks(dbpath, SQL_COMMAND):
                     df_result.to_csv('D:\\BT_CDL\\BT development\\cs.cdl\\Backtesting_V1_Q1\\data\\Full_Q2_BT_results\\file.csv', mode='a', header=False,
                               index=False)
                 
-                del df_result
-            else:
-                print("Number exceeds reasonnable capacity for a CSV format (>600000 rows). Please refine the query (group the data or aggregate it) \
-                      to obtain a lighter output.")
+                del df_result # liberating memory because of potentially big data
+                result = dbCursor.fetchmany(chunk_size)
+        else:
+            print("Number exceeds reasonnable capacity for a CSV format (>600000 rows). Please refine the query (group the data or aggregate it) \
+                  to obtain a lighter output.")
     except PermissionError:         
         print(
             "File used by another person, yourself, or simply not authorized to overwrite")
