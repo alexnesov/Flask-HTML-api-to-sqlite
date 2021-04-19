@@ -38,8 +38,8 @@
           <div class="card-body">
             <div class="row align-items-center">
            
-            <div>
-              <form action="{{ url_for('executeSQL') }}" method="POST">
+<form action="{{ url_for('executeSQL') }}" method="POST">
+
                    <label class="form-label">Default Location for CSV saving:</label>
                     <div class="mb-3">
                         <input class="form-control" placeholder="{{ currentWD }}" readonly>
@@ -56,8 +56,6 @@
                     <div class="mb-3">
                       <input class="form-control" name="dbPathForm" id="dbPathForm" placeholder="{{ DB_USER_INPUT }}">
                     </div> <!--mb3-->
-              </div>
-   
 
             </div>  <!--row -->
           </div> <!--card body-->
@@ -85,7 +83,8 @@
               <div class="col text-center" id="exc_btn">
                 <button class="btn btn-dark" type="submit">Execute command</button>
               </div>
-            </form>
+              
+  </form>
           </div> <!--sql container with command-->
 
 
