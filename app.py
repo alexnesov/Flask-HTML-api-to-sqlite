@@ -18,22 +18,37 @@ currentWD = os.path.dirname(__file__)  # WD = working directory
 
 chunk_size = 300000
 
+dbpath = '/home/nesov/Programmation/Flask-HTML-api-to-sqlite/utils/marketdataSQL.db'
+conn = sqlite3.connect(f'{dbpath}')
+dbCursor = conn.cursor()
+tablesList = dbCursor.execute(f"SELECT name FROM sqlite_master WHERE type='table'")
+tablesList2 = dbCursor.execute(f"select count(*) from (select * from quotes)")
 
+print(tablesList2.fetchall())
+
+
+qu = ''
 
 def getNRows(dbCursor, SQL_COMMAND):
+    """
+    Returns an integer, being the number of rows for the last query executed
+    by the user
+    """
     
+    """
     try:
         table = SQL_COMMAND.split("FROM")[1].split(" ")[1]
     except IndexError:
         table = SQL_COMMAND.split("from")[1].split(" ")[1]
-
-    dbCursor.execute(f"select count(*) from {table}")
+    """
+    
+    dbCursor.execute(f"select count(*) from ({SQL_COMMAND})")
     nRows = dbCursor.fetchall()[0][0]
     
     return nRows
 
 
-def toCSVinChunks(dbpath, SQL_COMMAND):
+def toCSVinChunks(dbpath, SQL_COMMAND, ):
     """
     Parameters
     ----------
@@ -47,6 +62,7 @@ def toCSVinChunks(dbpath, SQL_COMMAND):
     None.
 
     """
+    fileNameforSave = "sqliteoutput"
     
     conn = sqlite3.connect(f'{dbpath}')
     dbCursor = conn.cursor()
@@ -65,17 +81,16 @@ def toCSVinChunks(dbpath, SQL_COMMAND):
                 print("Iteration nb°: ", ITER)
                 ITER += 1
                 
-                print("len result: ", len(result))
-                
                 print("Converting result to df")
                 df_result = pd.DataFrame(result, columns=colNames)
                 if init==True:
                     print("Saving as CSV. . .")
-                    df_result.to_csv('', index=False)
+                    print(df_result)
+                    df_result.to_csv(f'{currentWD}/{fileNameforSave}.csv', index=False)
                     init = False
                 else:
                     print("Saving as CSV. . .")
-                    df_result.to_csv('', mode='a', header=False,
+                    df_result.to_csv(f'{currentWD}/{fileNameforSave}.csv', mode='a', header=False,
                               index=False)
                 
                 del df_result # liberating memory because of potentially big data
@@ -120,7 +135,7 @@ def readSqlite(dbpath, SQL_COMMAND):
     # Getting the name of the table in the query, to be able to place it in 
     # the coming select count(*) n rows
     
-
+    
     nRows = getNRows(dbCursor, SQL_COMMAND)
     print("nRows: ", nRows)
     
@@ -199,12 +214,12 @@ def executeSQL():
 
     SQL_COMMAND = request.form['textarea']
 
-    print('user input:', DB_USER_INPUT)
-    print("cmd:", SQL_COMMAND)
-
     if INIT == True:
         print('init true')
         DB_USER_INPUT = request.form.get('dbPathForm')
+
+    print('DB user input:', DB_USER_INPUT)
+    print("cmd:", SQL_COMMAND)
 
     if SQL_COMMAND:
         try:
@@ -244,5 +259,10 @@ def generateCSV():
                            **std_args)
 
 
+"""
+fileNameforSave = request.form.get('fileNameforSave')
+print("TEST: ", fileNameforSave)
+"""
+
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=80, debug=True)
+    app.run(debug=True)
