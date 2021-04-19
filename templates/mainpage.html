@@ -42,7 +42,7 @@
               <form action="{{ url_for('executeSQL') }}" method="POST">
                    <label class="form-label">Default Location for CSV saving:</label>
                     <div class="mb-3">
-                        <input class="form-control" placeholder="{{ currentWD }}">
+                        <input class="form-control" placeholder="{{ currentWD }}" readonly>
                     </div>
 
                     <label class="form-label">Path to sqlite DB:</label>

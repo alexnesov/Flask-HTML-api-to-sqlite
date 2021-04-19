@@ -19,7 +19,7 @@ currentWD = os.path.dirname(__file__)  # WD = working directory
 chunk_size = 300000
 
 
-
+# To: Add traceback to sql error
 
 def getNRows(dbCursor, SQL_COMMAND):
     """
