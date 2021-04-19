@@ -40,7 +40,7 @@ def getNRows(dbCursor, SQL_COMMAND):
     return nRows
 
 
-def toCSVinChunks(dbpath, SQL_COMMAND, ):
+def toCSVinChunks(dbpath, SQL_COMMAND):
     """
     Parameters
     ----------
