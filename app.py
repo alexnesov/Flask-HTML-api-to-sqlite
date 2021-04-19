@@ -20,7 +20,7 @@ chunk_size = 300000
 
 
 # To: Add traceback to sql error
-
+# Nb lines total and preview warning
 def getNRows(dbCursor, SQL_COMMAND):
     """
     Returns an integer, being the number of rows for the last query executed
