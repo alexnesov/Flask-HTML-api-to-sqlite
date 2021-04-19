@@ -18,16 +18,8 @@ currentWD = os.path.dirname(__file__)  # WD = working directory
 
 chunk_size = 300000
 
-dbpath = '/home/nesov/Programmation/Flask-HTML-api-to-sqlite/utils/marketdataSQL.db'
-conn = sqlite3.connect(f'{dbpath}')
-dbCursor = conn.cursor()
-tablesList = dbCursor.execute(f"SELECT name FROM sqlite_master WHERE type='table'")
-tablesList2 = dbCursor.execute(f"select count(*) from (select * from quotes)")
-
-print(tablesList2.fetchall())
 
 
-qu = ''
 
 def getNRows(dbCursor, SQL_COMMAND):
     """
@@ -259,10 +251,7 @@ def generateCSV():
                            **std_args)
 
 
-"""
-fileNameforSave = request.form.get('fileNameforSave')
-print("TEST: ", fileNameforSave)
-"""
+
 
 if __name__ == '__main__':
     app.run(debug=True)

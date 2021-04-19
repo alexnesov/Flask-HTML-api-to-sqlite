@@ -45,7 +45,6 @@
                     </div>
 
                     <label class="form-label">Path to sqlite DB:</label>
-
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                         class="bi bi-question-circle" viewBox="0 0 16 16" data-toggle="tooltip" data-placement="top"
                         title="Must be in this format: 'C:\\User\\folder\\folder\\dbfile.db' (do not forget double slashes)">
@@ -53,7 +52,6 @@
                         <path
                           d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z" />
                         </svg>
-
                     <div class="mb-3">
                       <input class="form-control" name="dbPathForm" id="dbPathForm" placeholder="{{ DB_USER_INPUT }}">
                     </div> <!--mb3-->
@@ -68,7 +66,7 @@
 
         </div> <!--card-->
 
-      </div> <!--col-->
+      </div> <!--col left-->
 
       <div class="col-sm">
 
@@ -91,17 +89,15 @@
                 <button class="btn btn-dark" type="submit">Execute command</button>
               </div>
             </form>
-          </div>
+          </div> <!--sql container with command-->
 
 
-
-        </div>
-      </div>
-
+        </div> <!--card right-->
+      </div> <!--col right-->
 
 
-    </div>
-  </div> <!-- first container-->
+    </div> 
+  </div> <!-- first container end-->
 
   </div>
 
@@ -114,9 +110,8 @@
     </div>
   <div style="clear: both;"></div>
 
+
   <div class="container">
-
-
     <div class="table-wrapper-scroll-y my-custom-scrollbar">
 
       <table class="table table-bordered table-striped table-sm table-hover">
@@ -134,10 +129,7 @@
         {% endfor %}
 
       </table>
-
-    </div>
-
-
+    </div> <!--scrollbar-->
   </div>
 
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
