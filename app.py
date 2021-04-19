@@ -48,11 +48,9 @@ def toCSVinChunks(dbpath, SQL_COMMAND, ):
         Path to db to query
     SQL_COMMAND : string
         User input, being the SQL command to execute
-
     Returns
     -------
     None.
-
     """
     fileNameforSave = "sqliteoutput"
     
@@ -109,7 +107,6 @@ def readSqlite(dbpath, SQL_COMMAND):
         Path to db to query
     SQL_COMMAND : string
         User input, being the SQL command to execute
-
     Returns
     -------
     sql_output : List of tuples

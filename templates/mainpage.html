@@ -18,7 +18,7 @@
 
   <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
     <div class="container">
-      <span class="navbar-brand mb-0 h1" id="Page_title"><a style="text-decoration:none; color:rgb(210, 220, 255)"
+      <span class="navbar-brand mb-0 h1" id="Page_title"><a style="text-decoration:none; color:rgb(255, 255, 255)"
           href="/">Sqlite
           explorer</a></span>
       <p class="navbar-text">Beta</p>
@@ -37,11 +37,12 @@
 
           <div class="card-body">
             <div class="row align-items-center">
-
+           
+            <div>
               <form action="{{ url_for('executeSQL') }}" method="POST">
-                   <label class="form-label">Default location for CSV saving:</label>
+                   <label class="form-label">Default Location for CSV saving:</label>
                     <div class="mb-3">
-                      <input class="form-control" placeholder="{{ currentWD }}">
+                        <input class="form-control" placeholder="{{ currentWD }}">
                     </div>
 
                     <label class="form-label">Path to sqlite DB:</label>
@@ -55,12 +56,9 @@
                     <div class="mb-3">
                       <input class="form-control" name="dbPathForm" id="dbPathForm" placeholder="{{ DB_USER_INPUT }}">
                     </div> <!--mb3-->
+              </div>
+   
 
-                    <label class="form-label">Name of CSV to save:</label>
-                    <div class="mb-3">
-                      <input class="form-control" name="fileNameforSave" id="fileNameforSave">
-                    </div> <!--mb3-->
-                  
             </div>  <!--row -->
           </div> <!--card body-->
 
@@ -75,10 +73,9 @@
             SQL command line
           </div>
           <div class="card-body" id="sql_container">
-            <form action="{{ url_for('executeSQL') }}" method="POST">
               <div class="input-group input-group-lg">
                 {% if valid==True %}
-                <textarea type="text" name="textarea" class="form-control is-valid" id="textarea"
+                <textarea type="text" name="textarea" class="form-control" id="textarea"
                   rows="4">{{SQL_COMMAND}}</textarea>
                 {%else%}
                 <textarea type="text" name="textarea" class="form-control is-invalid" id="textarea"
@@ -96,7 +93,7 @@
       </div> <!--col right-->
 
 
-    </div> 
+    </div>  <!--row-->
   </div> <!-- first container end-->
 
   </div>
