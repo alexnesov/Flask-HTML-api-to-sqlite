@@ -37,32 +37,37 @@
 
           <div class="card-body">
             <div class="row align-items-center">
-           
-<form action="{{ url_for('executeSQL') }}" method="POST">
 
-                   <label class="form-label">Default Location for CSV saving:</label>
-                    <div class="mb-3">
-                        <input class="form-control" placeholder="{{ currentWD }}" readonly>
-                    </div>
+              <form action="{{ url_for('executeSQL') }}" method="POST">
 
-                    <label class="form-label">Path to sqlite DB:</label>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                        class="bi bi-question-circle" viewBox="0 0 16 16" data-toggle="tooltip" data-placement="top"
-                        title="Must be in this format: 'C:\\User\\folder\\folder\\dbfile.db' (do not forget double slashes)">
-                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-                        <path
-                          d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z" />
-                        </svg>
-                    <div class="mb-3">
-                      <input class="form-control" name="dbPathForm" id="dbPathForm" placeholder="{{ DB_USER_INPUT }}">
-                    </div> <!--mb3-->
+                <label class="form-label">Default Location for CSV saving:</label>
+                <div class="mb-3">
+                  <input class="form-control" placeholder="{{ currentWD }}" readonly>
+                </div>
 
-            </div>  <!--row -->
-          </div> <!--card body-->
+                <label class="form-label">Path to sqlite DB:</label>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                  class="bi bi-question-circle" viewBox="0 0 16 16" data-toggle="tooltip" data-placement="top"
+                  title="Must be in this format: 'C:\\User\\folder\\folder\\dbfile.db' (do not forget double slashes)">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                  <path
+                    d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z" />
+                </svg>
+                <div class="mb-3">
+                  <input class="form-control" name="dbPathForm" id="dbPathForm" placeholder="{{ DB_USER_INPUT }}">
+                </div>
+                <!--mb3-->
 
-        </div> <!--card-->
+            </div>
+            <!--row -->
+          </div>
+          <!--card body-->
 
-      </div> <!--col left-->
+        </div>
+        <!--card-->
+
+      </div>
+      <!--col left-->
 
       <div class="col-sm">
 
@@ -71,38 +76,66 @@
             SQL command line
           </div>
           <div class="card-body" id="sql_container">
-              <div class="input-group input-group-lg">
-                {% if valid==True %}
-                <textarea type="text" name="textarea" class="form-control" id="textarea"
-                  rows="4">{{SQL_COMMAND}}</textarea>
-                {%else%}
-                <textarea type="text" name="textarea" class="form-control is-invalid" id="textarea"
-                  rows="4">{{SQL_COMMAND}}</textarea>
-                {% endif %}
-              </div>
-              <div class="col text-center" id="exc_btn">
-                <button class="btn btn-dark" type="submit">Execute command</button>
-              </div>
+            <div class="input-group input-group-lg">
+              {% if valid==True %}
+              <textarea type="text" name="textarea" class="form-control" id="textarea"
+                rows="4">{{SQL_COMMAND}}</textarea>
+              {%else%}
+              <textarea type="text" name="textarea" class="form-control is-invalid" id="textarea"
+                rows="4">{{SQL_COMMAND}}</textarea>
+              {% endif %}
+            </div>
+            <div class="col text-center" id="exc_btn">
+              <button class="btn btn-dark" type="submit">Execute command</button>
+            </div>
 
-</form>
+            </form>
 
-          </div> <!--sql container with command-->
-        </div> <!--card right-->
-      </div> <!--col right-->
+          </div>
+          <!--sql container with command-->
+        </div>
+        <!--card right-->
+      </div>
+      <!--col right-->
 
 
-    </div>  <!--row-->
+    </div>
+    <!--row-->
   </div> <!-- first container end-->
 
   </div>
 
-    <div class="container" id="Save">
+  <div class="container" id="Save">
 
-      <p class=" alignleft" id="sql_title">Output</p>
-      <p class="alignright">
-        <a href="{{ url_for('generateCSV')}}" input class="btn btn-success btn-sm mr-2 mb-2" id="getcsv">Save as CSV</a>
-      </p>
+    <div class="row">
+      <div class="col-sm">
+
+        <p class=" alignleft" id="sql_title">Output</p>
+      </div>
+      <div class="col-sm">
+      </div>
+      <div class="col-sm">
+
+        <p class="alignright">
+
+
+        <form action="{{ url_for('generateCSV') }}" method="POST">
+
+
+          <div class="input-group mb-3" id="Save">
+            <label class="form-label"></label>
+            <input class="form-control" name="CSVname_user" id="CSVname_user" placeholder="CSV name">
+            <button class="btn btn-dark" type="submit">Save CSV</button>
+          </div>
+        </form>
+
+        </p>
+      </div>
+
     </div>
+
+  </div> <!-- container Save-->
+
   <div style="clear: both;"></div>
 
 
@@ -124,7 +157,8 @@
         {% endfor %}
 
       </table>
-    </div> <!--scrollbar-->
+    </div>
+    <!--scrollbar-->
   </div>
 
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

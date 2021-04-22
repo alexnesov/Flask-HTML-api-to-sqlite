@@ -26,21 +26,21 @@ def getNRows(dbCursor, SQL_COMMAND):
     Returns an integer, being the number of rows for the last query executed
     by the user
     """
-    
+
     """
     try:
         table = SQL_COMMAND.split("FROM")[1].split(" ")[1]
     except IndexError:
         table = SQL_COMMAND.split("from")[1].split(" ")[1]
     """
-    
+
     dbCursor.execute(f"select count(*) from ({SQL_COMMAND})")
     nRows = dbCursor.fetchall()[0][0]
-    
+
     return nRows
 
 
-def toCSVinChunks(dbpath, SQL_COMMAND):
+def toCSVinChunks(dbpath, SQL_COMMAND, CSVname):
     """
     Parameters
     ----------
@@ -52,51 +52,50 @@ def toCSVinChunks(dbpath, SQL_COMMAND):
     -------
     None.
     """
-    fileNameforSave = "sqliteoutput"
-    
+    if CSVname == "":
+        CSVname = "sqloutput"
+
     conn = sqlite3.connect(f'{dbpath}')
     dbCursor = conn.cursor()
     nRows = getNRows(dbCursor, SQL_COMMAND)
-    
+
     try:
         if nRows < 600000:
             dbCursor.execute(f"{SQL_COMMAND}")
-            
+
             colNames = list(map(lambda x: x[0], dbCursor.description))
             result = dbCursor.fetchmany(chunk_size)
-            
+
             init = True
             ITER = 1
             while len(result) != 0:
                 print("Iteration nb°: ", ITER)
                 ITER += 1
-                
+
                 print("Converting result to df")
                 df_result = pd.DataFrame(result, columns=colNames)
-                if init==True:
+                if init == True:
                     print("Saving as CSV. . .")
                     print(df_result)
-                    df_result.to_csv(f'{currentWD}/{fileNameforSave}.csv', index=False)
+                    df_result.to_csv(
+                        f'{currentWD}/{CSVname}.csv', index=False)
                     init = False
                 else:
                     print("Saving as CSV. . .")
-                    df_result.to_csv(f'{currentWD}/{fileNameforSave}.csv', mode='a', header=False,
-                              index=False)
-                
-                del df_result # liberating memory because of potentially big data
+                    df_result.to_csv(f'{currentWD}/{CSVname}.csv', mode='a', header=False,
+                                     index=False)
+
+                del df_result  # liberating memory because of potentially big data
                 result = dbCursor.fetchmany(chunk_size)
         else:
             print("Number exceeds reasonnable capacity for a CSV format (>600000 rows). Please refine the query (group the data or aggregate it) \
                   to obtain a lighter output.")
-    except PermissionError:         
+    except PermissionError:
         print(
             "File used by another person, yourself, or simply not authorized to overwrite")
-    
+
     conn.commit()
     conn.close()
-
-
-
 
 
 def readSqlite(dbpath, SQL_COMMAND):
@@ -117,34 +116,29 @@ def readSqlite(dbpath, SQL_COMMAND):
         Cursor pointing towards the sqlite db to open, contains the sql 
         command information
     """
-    
+
     conn = sqlite3.connect(f'{dbpath}')
     dbCursor = conn.cursor()
-    
-    # Getting the name of the table in the query, to be able to place it in 
+
+    # Getting the name of the table in the query, to be able to place it in
     # the coming select count(*) n rows
-    
-    
+
     nRows = getNRows(dbCursor, SQL_COMMAND)
     print("nRows: ", nRows)
-    
+
     dbCursor.execute(f"{SQL_COMMAND}")
-    
+
     if nRows > 500:
         sql_output = dbCursor.fetchmany(500)
     else:
         sql_output = dbCursor.fetchall()
-        
+
     colNames = list(map(lambda x: x[0], dbCursor.description))
-        
-    
+
     conn.commit()
     conn.close()
 
     return sql_output, colNames
-
-
-        
 
 
 @app.route('/')
@@ -184,7 +178,7 @@ def STD_FUNC_FALSE():
     func, to be displayed through HTML, when no data can be queried due to
     an error 
     """
-    
+
     standard_args = dict(
         currentWD=currentWD,
         valid=False,
@@ -236,18 +230,18 @@ def executeSQL():
                                **std_args)
 
 
-@app.route('/executed')
+@app.route('/csv', methods=['POST'])
 def generateCSV():
 
+    CSVname_user = request.form.get('CSVname_user')
+    print('------------')
+    print(CSVname_user)
     std_args, df = STD_FUNC_TRUE(dbpath=DB_USER_INPUT)
-    toCSVinChunks(DB_USER_INPUT, SQL_COMMAND)
-
+    toCSVinChunks(DB_USER_INPUT, SQL_COMMAND, CSVname=CSVname_user)
 
     return render_template('mainpage.html',
                            SQL_COMMAND=SQL_COMMAND,
                            **std_args)
-
-
 
 
 if __name__ == '__main__':
