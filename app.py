@@ -6,6 +6,7 @@ import sqlite3
 import pandas as pd
 import os
 import time
+import traceback
 
 app = Flask(__name__, static_url_path='/static')
 
@@ -14,6 +15,7 @@ SQL_COMMAND = ""
 DB_USER_INPUT = ""
 INIT = True
 currentWD = os.path.dirname(__file__)  # WD = working directory
+
 
 
 chunk_size = 300000
@@ -40,6 +42,7 @@ def getNRows(dbCursor, SQL_COMMAND):
     return nRows
 
 
+
 def toCSVinChunks(dbpath, SQL_COMMAND, CSVname):
     """
     Parameters
@@ -55,6 +58,7 @@ def toCSVinChunks(dbpath, SQL_COMMAND, CSVname):
     if CSVname == "":
         CSVname = "sqloutput"
 
+    print("dbpath: ", dbpath)
     conn = sqlite3.connect(f'{dbpath}')
     dbCursor = conn.cursor()
     nRows = getNRows(dbCursor, SQL_COMMAND)
@@ -138,7 +142,7 @@ def readSqlite(dbpath, SQL_COMMAND):
     conn.commit()
     conn.close()
 
-    return sql_output, colNames
+    return sql_output, colNames, nRows
 
 
 @app.route('/')
@@ -156,9 +160,10 @@ def STD_FUNC_TRUE(dbpath):
     func, to be displayed through HTML
     """
 
-    sql_output, colNames = readSqlite(dbpath, SQL_COMMAND=SQL_COMMAND)
+    sql_output, colNames, nRows = readSqlite(dbpath, SQL_COMMAND=SQL_COMMAND)
     widthDF = list(range(len(colNames)))
     df = pd.DataFrame(sql_output)
+    print("INITTTTTTT TRUE: ", INIT)
 
     standard_args = dict(
         sql_output=sql_output,
@@ -166,6 +171,8 @@ def STD_FUNC_TRUE(dbpath):
         widthDF=widthDF,
         valid=True,
         currentWD=currentWD,
+        nRows=nRows,
+        INIT=INIT,
         DB_USER_INPUT=DB_USER_INPUT
     )
 
@@ -197,6 +204,7 @@ def executeSQL():
 
     SQL_COMMAND = request.form['textarea']
 
+    print("INITTTTTTT FALSE: ", INIT)
     if INIT == True:
         print('init true')
         DB_USER_INPUT = request.form.get('dbPathForm')
@@ -216,6 +224,7 @@ def executeSQL():
         except sqlite3.OperationalError:
             # If error in sql comand
             print("error in the SQL command")
+            print(traceback.format_exc())
             std_args = STD_FUNC_FALSE()
 
             return render_template('mainpage.html',
@@ -230,11 +239,11 @@ def executeSQL():
                                **std_args)
 
 
+
 @app.route('/csv', methods=['POST'])
 def generateCSV():
 
     CSVname_user = request.form.get('CSVname_user')
-    print('------------')
     print(CSVname_user)
     std_args, df = STD_FUNC_TRUE(dbpath=DB_USER_INPUT)
     toCSVinChunks(DB_USER_INPUT, SQL_COMMAND, CSVname=CSVname_user)
