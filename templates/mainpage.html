@@ -110,7 +110,15 @@
     <div class="row">
       <div class="col-sm">
 
-        <p class=" alignleft" id="sql_title">Output</p>
+        <p class=" alignleft" id="sql_title">Output (Preview set to 500 rows max).
+
+          {% if INIT==False %}
+        </br>
+          Original table: {{nRows}} rows. 
+          {%else%}
+          {% endif %}
+
+        </p>
       </div>
       <div class="col-sm">
       </div>
