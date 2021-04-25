@@ -51,3 +51,37 @@ def readSqlite(tableName, path='utils/marketdataSQL.db', query):
 
 df = pd.read_csv('utils/NASDAQ.csv')
 dfToSqlite(df, 'quotes')
+
+
+def createTable2(dbname='other.db'):
+    """
+    create Tabme in sqlite3 DB
+    """
+    conn = sqlite3.connect(dbname)
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS projects (
+                                        id integer PRIMARY KEY,
+                                        name text NOT NULL,
+                                        begin_date text,
+                                        end_date text
+                                    );''')
+
+    conn.commit()
+    conn.close()
+
+
+def adddata(dbname='other.db'):
+    """
+    create Tabme in sqlite3 DB
+    """
+    conn = sqlite3.connect(dbname)
+    c = conn.cursor()
+    c.execute('''INSERT INTO projects
+    (1,test,text,text)''')
+
+    conn.commit()
+    conn.close()
+
+
+# createTable2()
+adddata()

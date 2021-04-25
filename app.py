@@ -13,9 +13,8 @@ app = Flask(__name__, static_url_path='/static')
 sql_output = []
 SQL_COMMAND = ""
 DB_USER_INPUT = ""
-INIT = True
+INIT_DB_USER_INPUT = True
 currentWD = os.path.dirname(__file__)  # WD = working directory
-
 
 
 chunk_size = 300000
@@ -40,7 +39,6 @@ def getNRows(dbCursor, SQL_COMMAND):
     nRows = dbCursor.fetchall()[0][0]
 
     return nRows
-
 
 
 def toCSVinChunks(dbpath, SQL_COMMAND, CSVname):
@@ -159,11 +157,11 @@ def STD_FUNC_TRUE(dbpath):
     Set of standard variables to be passed inside each render_template()
     func, to be displayed through HTML
     """
+    global INIT_DB_USER_INPUT
 
     sql_output, colNames, nRows = readSqlite(dbpath, SQL_COMMAND=SQL_COMMAND)
     widthDF = list(range(len(colNames)))
     df = pd.DataFrame(sql_output)
-    print("INITTTTTTT TRUE: ", INIT)
 
     standard_args = dict(
         sql_output=sql_output,
@@ -172,7 +170,7 @@ def STD_FUNC_TRUE(dbpath):
         valid=True,
         currentWD=currentWD,
         nRows=nRows,
-        INIT=INIT,
+        INIT=INIT_DB_USER_INPUT,
         DB_USER_INPUT=DB_USER_INPUT
     )
 
@@ -195,27 +193,44 @@ def STD_FUNC_FALSE():
     return standard_args
 
 
+DB_USER_INPUT_previous = ""
+
+
 @app.route('/executed', methods=['POST'])
 def executeSQL():
     global SQL_COMMAND
     global sql_output
     global DB_USER_INPUT
-    global INIT
+    global DB_USER_INPUT_previous
+    global INIT_DB_USER_INPUT
+
+    print('-------------------------')
+    print("INIT 1: ", INIT_DB_USER_INPUT)
+
+    if INIT_DB_USER_INPUT == False:
+        print("INIT 2: ", INIT_DB_USER_INPUT)
+        DB_USER_INPUT_previous = DB_USER_INPUT
 
     SQL_COMMAND = request.form['textarea']
 
-    print("INITTTTTTT FALSE: ", INIT)
-    if INIT == True:
-        print('init true')
-        DB_USER_INPUT = request.form.get('dbPathForm')
+    if INIT_DB_USER_INPUT == False:
+        if request.form.get('dbPathForm') != "":
+            DB_USER_INPUT = request.form.get('dbPathForm')
+            print("new DB user input used")
+        else:
+            print("user input empty, hence using old one")
 
-    print('DB user input:', DB_USER_INPUT)
+    if INIT_DB_USER_INPUT == True:
+        print("very first: ")
+        DB_USER_INPUT = request.form.get('dbPathForm')
+        INIT_DB_USER_INPUT = False
+
+    print("excuted SQL DB_USER_INPUT: ", DB_USER_INPUT)
     print("cmd:", SQL_COMMAND)
 
     if SQL_COMMAND:
         try:
             std_args, df = STD_FUNC_TRUE(dbpath=DB_USER_INPUT)
-            INIT = False
 
             return render_template(
                 'mainpage.html',
@@ -237,7 +252,6 @@ def executeSQL():
         return render_template('mainpage.html',
                                SQL_COMMAND=SQL_COMMAND,
                                **std_args)
-
 
 
 @app.route('/csv', methods=['POST'])
