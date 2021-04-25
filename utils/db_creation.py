@@ -53,6 +53,12 @@ df = pd.read_csv('utils/NASDAQ.csv')
 dfToSqlite(df, 'quotes')
 
 
+"""
+Just creating a new DB and populating it
+to test the DB swich (path switch) in the main flask app
+"""
+
+
 def createTable2(dbname='other.db'):
     """
     create Tabme in sqlite3 DB
@@ -77,7 +83,9 @@ def adddata(dbname='other.db'):
     conn = sqlite3.connect(dbname)
     c = conn.cursor()
     c.execute('''INSERT INTO projects
-    (1,test,text,text)''')
+    (id,name,begin_date,end_date)
+    VALUES
+    (1,'test','2020','2021')''')
 
     conn.commit()
     conn.close()

@@ -204,9 +204,6 @@ def executeSQL():
     global DB_USER_INPUT_previous
     global INIT_DB_USER_INPUT
 
-    print('-------------------------')
-    print("INIT 1: ", INIT_DB_USER_INPUT)
-
     if INIT_DB_USER_INPUT == False:
         print("INIT 2: ", INIT_DB_USER_INPUT)
         DB_USER_INPUT_previous = DB_USER_INPUT
@@ -221,7 +218,7 @@ def executeSQL():
             print("user input empty, hence using old one")
 
     if INIT_DB_USER_INPUT == True:
-        print("very first: ")
+        print("very first cmd execution: ")
         DB_USER_INPUT = request.form.get('dbPathForm')
         INIT_DB_USER_INPUT = False
 
