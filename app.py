@@ -240,7 +240,6 @@ DB_USER_INPUT_previous = ""
 @app.route('/executed', methods=['POST'])
 def executeSQL():
     global SQL_COMMAND
-    global sql_output
     global DB_USER_INPUT
     global DB_USER_INPUT_previous
     global INIT_DB_USER_INPUT
