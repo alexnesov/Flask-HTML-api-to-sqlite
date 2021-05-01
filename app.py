@@ -8,6 +8,7 @@ import os
 import time
 import traceback
 
+
 app = Flask(__name__, static_url_path='/static')
 
 sql_output = []
@@ -15,33 +16,35 @@ SQL_COMMAND = ""
 DB_USER_INPUT = ""
 INIT_DB_USER_INPUT = True
 currentWD = os.path.dirname(__file__)  # WD = working directory
-
+tempDB = "temp.db"
+temp_db = os.path.join(currentWD, tempDB)
 
 chunk_size = 300000
 
 
 # To: Add traceback to sql error
 # Nb lines total and preview warning
-def getNRows(dbCursor, SQL_COMMAND):
+def getNRows():
     """
     Returns an integer, being the number of rows for the last query executed
     by the user
     """
 
-    """
-    try:
-        table = SQL_COMMAND.split("FROM")[1].split(" ")[1]
-    except IndexError:
-        table = SQL_COMMAND.split("from")[1].split(" ")[1]
-    """
+    temp_con = sqlite3.connect(f'{temp_db}')
+    tempCursor = temp_con.cursor()
 
-    dbCursor.execute(f"select count(*) from ({SQL_COMMAND})")
-    nRows = dbCursor.fetchall()[0][0]
+    tempCursor.execute("SELECT COUNT(*) FROM temp_table;")
+
+    nRows = tempCursor.fetchall()
+    nRows = nRows[0][0]
+
+    temp_con.commit()
+    temp_con.close()
 
     return nRows
 
 
-def toCSVinChunks(dbpath, SQL_COMMAND, CSVname):
+def toCSVinChunks(CSVname):
     """
     Parameters
     ----------
@@ -56,17 +59,17 @@ def toCSVinChunks(dbpath, SQL_COMMAND, CSVname):
     if CSVname == "":
         CSVname = "sqloutput"
 
-    print("dbpath: ", dbpath)
-    conn = sqlite3.connect(f'{dbpath}')
-    dbCursor = conn.cursor()
-    nRows = getNRows(dbCursor, SQL_COMMAND)
+    temp_con = sqlite3.connect(f'{temp_db}')
+    tempCursor = temp_con.cursor()
+
+    nRows = getNRows()
 
     try:
         if nRows < 600000:
-            dbCursor.execute(f"{SQL_COMMAND}")
+            tempCursor.execute(f"SELECT * FROM temp_table")
 
-            colNames = list(map(lambda x: x[0], dbCursor.description))
-            result = dbCursor.fetchmany(chunk_size)
+            colNames = list(map(lambda x: x[0], tempCursor.description))
+            result = tempCursor.fetchmany(chunk_size)
 
             init = True
             ITER = 1
@@ -88,7 +91,7 @@ def toCSVinChunks(dbpath, SQL_COMMAND, CSVname):
                                      index=False)
 
                 del df_result  # liberating memory because of potentially big data
-                result = dbCursor.fetchmany(chunk_size)
+                result = tempCursor.fetchmany(chunk_size)
         else:
             print("Number exceeds reasonnable capacity for a CSV format (>600000 rows). Please refine the query (group the data or aggregate it) \
                   to obtain a lighter output.")
@@ -96,8 +99,8 @@ def toCSVinChunks(dbpath, SQL_COMMAND, CSVname):
         print(
             "File used by another person, yourself, or simply not authorized to overwrite")
 
-    conn.commit()
-    conn.close()
+    temp_con.commit()
+    temp_con.close()
 
 
 def readSqlite(dbpath, SQL_COMMAND):
@@ -122,10 +125,21 @@ def readSqlite(dbpath, SQL_COMMAND):
     conn = sqlite3.connect(f'{dbpath}')
     dbCursor = conn.cursor()
 
+    if os.path.isfile(temp_db):
+        print('Temp DB exists and will be populated.')
+    else:
+        temp_con = sqlite3.connect(f'{temp_db}')
+        temp_con.commit()
+        temp_con.close()
+
+    dbCursor.execute(f"ATTACH DATABASE '{temp_db}' AS temp_db;")
+    dbCursor.execute("DROP TABLE IF EXISTS temp_db.temp_table")
+    dbCursor.execute(f"CREATE TABLE temp_db.temp_table AS {SQL_COMMAND};")
+    dbCursor.execute(f"DETACH DATABASE 'temp_db';")
+
     # Getting the name of the table in the query, to be able to place it in
     # the coming select count(*) n rows
-
-    nRows = getNRows(dbCursor, SQL_COMMAND)
+    nRows = getNRows()
     print("nRows: ", nRows)
 
     dbCursor.execute(f"{SQL_COMMAND}")
@@ -145,6 +159,7 @@ def readSqlite(dbpath, SQL_COMMAND):
 
 @app.route('/')
 def home():
+
     return render_template('mainpage.html',
                            currentWD=currentWD,
                            DB_USER_INPUT=DB_USER_INPUT,
@@ -152,14 +167,40 @@ def home():
 # to do: init command to avoid red arrow
 
 
-def STD_FUNC_TRUE(dbpath):
+def readTempDB():
+
+    temp_con = sqlite3.connect(f'{temp_db}')
+    tempCursor = temp_con.cursor()
+    tempCursor.execute(f"SELECT * FROM temp_table")
+
+    nRows = getNRows()
+
+    if nRows > 500:
+        sql_output = tempCursor.fetchmany(500)
+    else:
+        sql_output = tempCursor.fetchall()
+
+    colNames = list(map(lambda x: x[0], tempCursor.description))
+
+    temp_con.commit()
+    temp_con.close()
+
+    return sql_output, colNames, nRows
+
+
+def STD_FUNC_TRUE(dbpath, CSVSaveMode=False):
     """
     Set of standard variables to be passed inside each render_template()
-    func, to be displayed through HTML
+    func to be displayed through HTML
     """
     global INIT_DB_USER_INPUT
 
-    sql_output, colNames, nRows = readSqlite(dbpath, SQL_COMMAND=SQL_COMMAND)
+    if CSVSaveMode == False:
+        sql_output, colNames, nRows = readSqlite(
+            dbpath, SQL_COMMAND=SQL_COMMAND)
+    else:
+        sql_output, colNames, nRows = readTempDB()
+
     widthDF = list(range(len(colNames)))
     df = pd.DataFrame(sql_output)
 
@@ -256,8 +297,8 @@ def generateCSV():
 
     CSVname_user = request.form.get('CSVname_user')
     print(CSVname_user)
-    std_args, df = STD_FUNC_TRUE(dbpath=DB_USER_INPUT)
-    toCSVinChunks(DB_USER_INPUT, SQL_COMMAND, CSVname=CSVname_user)
+    std_args, df = STD_FUNC_TRUE(dbpath=DB_USER_INPUT, CSVSaveMode=True)
+    toCSVinChunks(CSVname=CSVname_user)
 
     return render_template('mainpage.html',
                            SQL_COMMAND=SQL_COMMAND,
