@@ -48,6 +48,10 @@ def toCSVinChunks(CSVname):
     """
     Parameters
     ----------
+    dbpath : string
+        Path to db to query
+    SQL_COMMAND : string
+        User input, being the SQL command to execute
     Returns
     -------
     None.
@@ -132,21 +136,27 @@ def readSqlite(dbpath, SQL_COMMAND):
     dbCursor.execute("DROP TABLE IF EXISTS temp_db.temp_table")
     dbCursor.execute(f"CREATE TABLE temp_db.temp_table AS {SQL_COMMAND};")
     dbCursor.execute(f"DETACH DATABASE 'temp_db';")
-
+    conn.commit()
+    conn.close()
     # Getting the name of the table in the query, to be able to place it in
     # the coming select count(*) n rows
     nRows = getNRows()
     print("nRows: ", nRows)
 
+    temp_con = sqlite3.connect(f'{temp_db}')
+    tempCursor = temp_con.cursor()
+
+    tempCursor.execute(f"SELECT * FROM temp_table")
+
     if nRows > 500:
-        sql_output = dbCursor.fetchmany(500)
+        sql_output = tempCursor.fetchmany(500)
     else:
-        sql_output = dbCursor.fetchall()
+        sql_output = tempCursor.fetchall()
 
-    colNames = list(map(lambda x: x[0], dbCursor.description))
+    colNames = list(map(lambda x: x[0], tempCursor.description))
 
-    conn.commit()
-    conn.close()
+    temp_con.commit()
+    temp_con.close()
 
     return sql_output, colNames, nRows
 
