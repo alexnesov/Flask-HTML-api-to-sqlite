@@ -48,10 +48,6 @@ def toCSVinChunks(CSVname):
     """
     Parameters
     ----------
-    dbpath : string
-        Path to db to query
-    SQL_COMMAND : string
-        User input, being the SQL command to execute
     Returns
     -------
     None.
@@ -141,8 +137,6 @@ def readSqlite(dbpath, SQL_COMMAND):
     # the coming select count(*) n rows
     nRows = getNRows()
     print("nRows: ", nRows)
-
-    dbCursor.execute(f"{SQL_COMMAND}")
 
     if nRows > 500:
         sql_output = dbCursor.fetchmany(500)
