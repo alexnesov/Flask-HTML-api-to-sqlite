@@ -54,7 +54,7 @@ def toCSVinChunks(CSVname):
     -------
     None.
 
-    The function is design with big data in mind.
+    The function is designed with big data in mind.
     Meaning that if the size of the table is big, it will transfer the data from sqlite to csv in chunks of data.
     """
     if CSVname == "":
