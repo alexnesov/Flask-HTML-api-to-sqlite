@@ -48,10 +48,8 @@ def toCSVinChunks(CSVname):
     """
     Parameters
     ----------
-    dbpath : string
-        Path to db to query
-    SQL_COMMAND : string
-        User input, being the SQL command to execute
+    CSVname : string
+        name of CSV (as specified by user input or as "sqloutput.csv" if user input empty), is going to be saved in root folder
     Returns
     -------
     None.
