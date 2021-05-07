@@ -127,16 +127,19 @@ def readSqlite(dbpath, SQL_COMMAND):
     dbCursor = conn.cursor()
 
     if os.path.isfile(temp_db):
-        print('Temp DB exists and will be populated.')
+        print('Temp DB exists. Old Data is overwritten, and new data is added.')
     else:
+        print('Creating the temporary table.')
         temp_con = sqlite3.connect(f'{temp_db}')
         temp_con.commit()
         temp_con.close()
-
+    
+    print('Populating the temporary table. . .')
     dbCursor.execute(f"ATTACH DATABASE '{temp_db}' AS temp_db;")
     dbCursor.execute("DROP TABLE IF EXISTS temp_db.temp_table")
     dbCursor.execute(f"CREATE TABLE temp_db.temp_table AS {SQL_COMMAND};")
     dbCursor.execute(f"DETACH DATABASE 'temp_db';")
+    print('Temporary table created and populated.')
     conn.commit()
     conn.close()
     # Getting the name of the table in the query, to be able to place it in
@@ -147,6 +150,8 @@ def readSqlite(dbpath, SQL_COMMAND):
     temp_con = sqlite3.connect(f'{temp_db}')
     tempCursor = temp_con.cursor()
 
+    
+    print('Reading data from temporary table to be displayed in browser.')
     tempCursor.execute(f"SELECT * FROM temp_table")
 
     if nRows > 500:
@@ -258,9 +263,9 @@ def executeSQL():
     if INIT_DB_USER_INPUT == False:
         if request.form.get('dbPathForm') != "":
             DB_USER_INPUT = request.form.get('dbPathForm')
-            print("new DB user input used")
+            print("New DB user input used.")
         else:
-            print("user input empty, hence using old one")
+            print("User input empty, hence using old one.")
 
     if INIT_DB_USER_INPUT == True:
         print("very first cmd execution: ")
